@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>리코MBA 29기 입학경로 지도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 단일 리포트 컬럼(최대 1120px) — 요약 수치 → 경로 지도 → 교차점·경로 유효성 → 시사점 → 모집전략 → 응답 원자료 */
+:root{
+  --bg:#f7f7f4; --surface:#ffffff; --ink:#15212e; --ink-2:#4b5563; --ink-3:#7b8491;
+  --line:#e2e3dd; --node:#223244; --node-ink:#ffffff;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --hl:#fff4d6; --hl-ink:#7a4d00;
+  --f-display:"Noto Serif KR","Nanum Myeongjo",Georgia,serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12171d; --surface:#1a2129; --ink:#eef1f4; --ink-2:#b7bec7; --ink-3:#8a939e;
+  --line:#2c3540; --node:#d8dee6; --node-ink:#12171d;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --hl:#3a2f12; --hl-ink:#f5d58a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171d; --surface:#1a2129; --ink:#eef1f4; --ink-2:#b7bec7; --ink-3:#8a939e;
+  --line:#2c3540; --node:#d8dee6; --node-ink:#12171d;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --hl:#3a2f12; --hl-ink:#f5d58a; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:40px 64px;display:grid;gap:48px}
+h1,h2{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:clamp(26px,4vw,36px)}
+h2{font-size:22px}
+h3{font-size:16px;margin:0 0 6px}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--ink-3);font-weight:600}
+.lede{color:var(--ink-2);max-width:68ch;margin-top:10px}
+.sec{display:grid;gap:18px;min-width:0}
+.sec-head{display:grid;gap:6px}
+.note{font-size:13px;color:var(--ink-3)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.kpi{padding:16px 16px 18px 0;display:grid;gap:4px;min-width:0}
+.kpi + .kpi{padding-left:16px;border-left:1px solid var(--line)}
+.kpi b{font-family:var(--f-mono);font-size:30px;font-weight:500;line-height:1.1}
+.kpi span{font-size:13px;color:var(--ink-2)}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi:nth-child(3){padding-left:0;border-left:0}.kpi:nth-child(n+3){border-top:1px solid var(--line)}}
+
+/* Sankey */
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer}
+.toolbar button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.toolbar button:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--ink-2);margin-left:auto}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.scroll{overflow-x:auto}
+svg#sankey{display:block;min-width:900px;width:100%;height:auto}
+.band{transition:opacity .2s}
+.dim .band.off{opacity:.08}
+.node-label{font-size:13px;font-weight:600;fill:var(--node-ink)}
+.node-count{font-family:var(--f-mono);font-size:12px;fill:var(--node-ink);opacity:.8}
+.col-head{font-size:12px;font-weight:600;fill:var(--ink-3);letter-spacing:.04em}
+.col-q{font-size:11px;fill:var(--ink-3)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;padding:8px 10px;border-radius:6px;max-width:280px;z-index:10;line-height:1.5}
+.cap{font-size:13px;color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){.band{transition:none}}
+
+/* Paths table */
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--ink-3);font-weight:600;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+.bar{display:inline-block;height:8px;border-radius:0 4px 4px 0;background:var(--ink-2);vertical-align:middle;margin-right:8px}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.pill.core{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pill.hub{background:var(--hl);color:var(--hl-ink);border-color:transparent}
+.route{white-space:nowrap}
+.route i{font-style:normal;color:var(--ink-3);margin:0 4px}
+
+/* Crossing */
+.cross{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:860px){.cross{grid-template-columns:1fr}}
+.cross article{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+.cross .tag{font-size:12px;font-weight:600;color:var(--hl-ink);background:var(--hl);justify-self:start;padding:2px 8px;border-radius:4px}
+.cross p{font-size:14px;color:var(--ink-2)}
+
+/* Insights & strategy */
+.insights{display:grid;gap:0;border-top:2px solid var(--ink)}
+.ins{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;padding:18px 0;border-bottom:1px solid var(--line)}
+.ins .n{font-family:var(--f-mono);color:var(--ink-3);font-size:14px;padding-top:2px}
+.ins p{color:var(--ink-2);max-width:72ch}
+.ins q{color:var(--ink);font-style:normal}
+.strat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.strat{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:10px;align-content:start;min-width:0}
+.card .who{font-size:12px;color:var(--ink-3);font-weight:600;letter-spacing:.04em}
+.card ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:14px;display:grid;gap:4px}
+.card .kpi-line{font-size:13px;border-top:1px dashed var(--line);padding-top:10px;color:var(--ink-2)}
+.card .kpi-line b{color:var(--ink);font-weight:600}
+.limits{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;font-size:14px;color:var(--ink-2);display:grid;gap:8px}
+.limits ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+</style>
+</head>
+<body>
+<style>
+:root{--s4:#4a3aa7;--s5:#8f96a0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--s4:#9085e9;--s5:#7d858f}}
+:root[data-theme="dark"]{--s4:#9085e9;--s5:#7d858f}
+.mix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.mix{grid-template-columns:1fr}}
+.mix div{border-top:2px solid var(--ink);padding-top:10px;display:grid;gap:4px}
+.mix b{font-family:var(--f-mono);font-size:24px;font-weight:500}
+.mix span{font-size:13px;color:var(--ink-2)}
+.cmp{font-size:14px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">국민대 경영대학원 리더십과코칭MBA · 29기 신입생 설문 · n=25</div>
+    <h1>리코MBA 29기 입학경로 지도</h1>
+    <p class="lede">신입생 25명이 리코MBA 정보를 얻은 경로에서 입학을 결정한 요인, 그리고 입학 관련 제안까지를 화살표로 이었습니다. 화살표 굵기는 인원 수이고, 색은 처음 정보를 얻은 채널을 끝까지 따라갑니다.</p>
+  </header>
+
+  <section class="kpis" aria-label="핵심 수치">
+    <div class="kpi"><b>12<small class="num" style="font-size:16px">/25</small></b><span>지인을 통해 처음 정보를 얻음 (48%)</span></div>
+    <div class="kpi"><b>8<small class="num" style="font-size:16px">/12</small></b><span>지인으로 시작해 지인 추천으로 결정 (67%)</span></div>
+    <div class="kpi"><b>6<small class="num" style="font-size:16px">/6</small></b><span>홈페이지로 들어온 9명의 결정 요인이 6개 유형 전부로 흩어짐</span></div>
+    <div class="kpi"><b>3<small class="num" style="font-size:16px">/3</small></b><span>교수진을 보고 결정한 입학생은 모두 지인 외 채널 출신</span></div>
+  </section>
+
+  <section class="sec" aria-labelledby="map-h">
+    <div class="sec-head">
+      <h2 id="map-h">입학경로 흐름</h2>
+      <p class="note">설문 1번(정보 획득) → 2번(결정에 가장 큰 영향, ‘기타’는 3번 이유로 보완) → 4번(제안사항, 유형화). 경로나 상자에 마우스를 올리면 해당 입학생들의 전체 여정이 강조됩니다. 점선 상자는 여러 경로가 만나는 교차점입니다.</p>
+    </div>
+    <div class="chart">
+      <div class="toolbar" role="group" aria-label="경로 강조">
+        <button type="button" data-f="all" aria-pressed="true">전체</button>
+        <button type="button" data-f="core" aria-pressed="false">핵심 경로: 지인 → 지인 추천</button>
+        <button type="button" data-f="hub" aria-pressed="false">홈페이지 유입</button>
+        <button type="button" data-f="prog" aria-pressed="false">프로그램(커리큘럼·교수진)으로 결정</button>
+        <button type="button" data-f="ext" aria-pressed="false">지인 외 채널 유입</button>
+      </div>
+      <div class="legend" style="margin-left:0" aria-label="색 범례: 처음 정보를 얻은 채널">
+        <span><i style="background:var(--s1)"></i>지인</span>
+        <span><i style="background:var(--s2)"></i>대학원 홈페이지</span>
+        <span><i style="background:var(--s3)"></i>컨퍼런스 등</span>
+        <span><i style="background:var(--s4)"></i>입학상담</span>
+        <span><i style="background:var(--s5)"></i>기타</span>
+      </div>
+      <div class="scroll"><svg id="sankey" viewBox="0 0 1120 560" role="img" aria-label="29기 입학경로 산키 다이어그램"></svg></div>
+      <p class="cap" id="cap">전체 25명의 경로입니다.</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="why-h">
+    <div class="sec-head">
+      <h2 id="why-h">무엇을 보고 결정했나</h2>
+      <p class="note">2번 문항의 결정 요인을 성격에 따라 세 묶음으로 나눴습니다.</p>
+    </div>
+    <div class="mix">
+      <div><b>11<small class="num" style="font-size:14px"> 명 · 44%</small></b><span><strong>사람</strong>: 지인 추천 9, 동문 네트워크 2</span></div>
+      <div><b>9<small class="num" style="font-size:14px"> 명 · 36%</small></b><span><strong>프로그램</strong>: 커리큘럼 5, 교수진 3, 토요 전일제 수업 1</span></div>
+      <div><b>5<small class="num" style="font-size:14px"> 명 · 20%</small></b><span><strong>브랜드·자격</strong>: 전공 인지도 4, 자격증 취득 1</span></div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="cross-h">
+    <div class="sec-head">
+      <h2 id="cross-h">교차하는 지점</h2>
+      <p class="note">서로 다른 경로가 갈라지거나 모이는 곳입니다. 이곳을 정비하면 여러 경로에 동시에 효과가 납니다.</p>
+    </div>
+    <div class="cross">
+      <article>
+        <span class="tag">교차점 1 · 갈라지는 곳</span>
+        <h3>대학원 홈페이지</h3>
+        <p>9명(36%)이 홈페이지로 처음 정보를 얻었고, 이들의 결정 요인은 커리큘럼 3, 기타 2, 지인 추천·인지도·교수진·동문 네트워크 각 1로 여섯 유형 모두에 흩어졌습니다. 사람마다 확인하려는 것이 다르기 때문에, 홈페이지가 결정 요인 각각에 답을 갖고 있어야 합니다.</p>
+      </article>
+      <article>
+        <span class="tag">교차점 2 · 모이는 곳</span>
+        <h3>전공 커리큘럼</h3>
+        <p>5명이 커리큘럼을 보고 결정했는데, 들어온 길이 홈페이지 3, 지인 1, 기타 1로 세 갈래입니다. 지인 추천 다음으로 많은 결정 요인이고, 추천이 없는 사람에게는 가장 강한 설득 수단입니다.</p>
+      </article>
+      <article>
+        <span class="tag">교차점 3 · 모이는 곳</span>
+        <h3>교수진(전문성)</h3>
+        <p>3명이 교수진을 보고 결정했고, 홈페이지·컨퍼런스·기타로 모두 다른 길에서 왔습니다. 지인으로 들어온 사람은 없습니다. 교수진은 추천 밖의 사람을 끌어오는 요인이고, 컨퍼런스처럼 교수가 직접 보이는 자리가 효과적입니다.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="path-h">
+    <div class="sec-head">
+      <h2 id="path-h">채널별 유효성</h2>
+      <p class="note">입학생 기여도(그 채널로 들어온 인원 비율), 자기완결성(같은 성격의 요인으로 결정까지 간 비율), 결정 요인의 분산 정도로 판단했습니다. 미등록 지원자 자료가 없어 실제 전환율은 계산할 수 없습니다.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>정보 획득 채널</th><th class="r">인원</th><th>입학생 기여도</th><th>결정 요인 (인원)</th><th>제안 응답</th><th>판단</th></tr></thead>
+        <tbody>
+          <tr><td>지인</td><td class="r num">12</td><td><span class="bar" style="width:96px"></span><span class="num">48%</span></td><td>지인 추천 8 · 인지도 3 · 커리큘럼 1</td><td class="num">3/12</td><td><span class="pill core">핵심 경로</span> 추천으로 완결 67%</td></tr>
+          <tr><td>대학원 홈페이지</td><td class="r num">9</td><td><span class="bar" style="width:72px"></span><span class="num">36%</span></td><td>커리큘럼 3 · 기타 2 · 지인 추천 1 · 인지도 1 · 교수진 1 · 동문 1</td><td class="num">4/9</td><td><span class="pill hub">교차점</span> 결정 요인 6종 분산</td></tr>
+          <tr><td>기타</td><td class="r num">2</td><td><span class="bar" style="width:16px"></span><span class="num">8%</span></td><td>교수진 1 · 커리큘럼 1</td><td class="num">0/2</td><td>프로그램으로 결정</td></tr>
+          <tr><td>컨퍼런스 등</td><td class="r num">1</td><td><span class="bar" style="width:8px"></span><span class="num">4%</span></td><td>교수진 1</td><td class="num">1/1</td><td>교수 노출 채널</td></tr>
+          <tr><td>입학상담</td><td class="r num">1</td><td><span class="bar" style="width:8px"></span><span class="num">4%</span></td><td>동문 네트워크 1</td><td class="num">1/1</td><td>상담이 첫 접점</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="ins-h">
+    <div class="sec-head"><h2 id="ins-h">시사점</h2></div>
+    <div class="insights">
+      <div class="ins"><span class="n">1</span><div><h3>추천이 가장 큰 경로이고, 나머지 절반은 다른 길로 들어왔습니다</h3><p>지인으로 처음 알게 된 사람은 12명(48%)이고, 그중 8명이 지인 추천으로 결정했습니다. 나머지 4명 중 3명은 ‘전공 인지도’를 결정 요인으로 꼽았습니다. 지인의 이야기가 리코의 평판으로 이어지고 있다는 뜻입니다. 재학생들도 이 점을 알고 있습니다. <q>재학생 졸업생의 추천활동이 가장 강력한 홍보라 생각합니다.</q> <q>입소문이 최곱니다. 노력하겠습니다.</q></p></div></div>
+      <div class="ins"><span class="n">2</span><div><h3>홈페이지로 온 사람은 저마다 다른 이유로 결정합니다</h3><p>홈페이지로 들어온 9명은 결정 요인이 여섯 유형에 모두 흩어졌습니다. 가장 많은 것은 커리큘럼(3명)입니다. 홈페이지는 커리큘럼·교수진·동문·학사 운영(토요 전일제)·자격증 정보를 모두 갖춰야 하는 자리이고, 하나라도 비면 그 이유로 결정할 사람을 놓칩니다.</p></div></div>
+      <div class="ins"><span class="n">3</span><div><h3>추천 밖의 사람은 프로그램의 내용을 보고 들어옵니다</h3><p>지인 외 채널로 들어온 13명 중 8명이 커리큘럼·교수진·수업 방식 같은 프로그램 요인으로 결정했습니다. 지인으로 들어온 12명 중에서는 1명뿐입니다. 교수진을 보고 결정한 3명은 전원 지인 외 채널 출신입니다. 외부 유입을 늘리려면 프로그램 자체를 보여주는 콘텐츠가 필요합니다.</p></div></div>
+      <div class="ins"><span class="n">4</span><div><h3>제안의 중심은 ‘진로와 차별점을 보여 달라’입니다</h3><p>제안을 남긴 9명 중 3명이 졸업 후 진로, 외부 자격증 과정과의 차이를 알려 달라고 했습니다. 셋 모두 홈페이지나 입학상담으로 들어온 사람입니다. <q>코칭 자격증을 외부 기관에서 따는 것과 리코 MBA에서 배우는 것의 차이는?</q> <q>입학부터 졸업, 졸업 이후의 로드맵을 좀 더 분명히 제시해주면 좋겠습니다.</q></p></div></div>
+      <div class="ins"><span class="n">5</span><div><h3>추천을 도울 도구와 외부 행사가 요청되고 있습니다</h3><p>추천으로 들어온 입학생은 추천을 돕는 소개자료를, 홈페이지로 들어온 입학생은 온·오프라인 설명회와 SNS 홍보를 제안했습니다. 장학 제안은 1건이었지만, KPC 취득자 장학처럼 다른 대학과 비교한 구체적인 내용이었습니다.</p></div></div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="st-h">
+    <div class="sec-head">
+      <h2 id="st-h">모집전략</h2>
+      <p class="note">추천 경로는 도구로 키우고, 홈페이지는 결정 요인별로 채우고, 프로그램을 보여줄 외부 접점을 넓히는 순서입니다.</p>
+    </div>
+    <div class="strat">
+      <article class="card">
+        <div class="who">키우기 · 지인 → 지인 추천</div>
+        <h3>추천인을 위한 소개 키트</h3>
+        <ul>
+          <li>재학생·동문이 바로 전달할 수 있는 1장 소개자료, 짧은 영상, 설명회 초대 링크 제공 (29기 제안 그대로)</li>
+          <li>추천인과 함께 오는 공개 수업·특강 정례화</li>
+          <li>지원서에 추천인 이름·기수 기입란 추가</li>
+        </ul>
+        <p class="kpi-line"><b>측정</b> 추천 유입 비율과 추천인당 지원자 수</p>
+      </article>
+      <article class="card">
+        <div class="who">정비하기 · 교차점 1 홈페이지</div>
+        <h3>결정 요인별로 답하는 홈페이지</h3>
+        <ul>
+          <li>커리큘럼, 교수진, 동문 네트워크, 수업 운영(토요 전일제), 자격증 취득을 각각 한 블록씩 배치</li>
+          <li>커리큘럼은 과목 목록보다 “이 과목을 마치면 무엇을 할 수 있나” 중심으로 설명</li>
+          <li>문의 메일·상담 예약을 모든 블록 끝에 연결</li>
+        </ul>
+        <p class="kpi-line"><b>측정</b> 블록별 조회 수, 홈페이지 방문→문의 비율</p>
+      </article>
+      <article class="card">
+        <div class="who">정비하기 · 정보 공백</div>
+        <h3>진로 로드맵과 차별점 콘텐츠</h3>
+        <ul>
+          <li>입학 → 재학 → 자격 취득 → 졸업 후 코치 진로까지의 로드맵 1장 제작</li>
+          <li>“외부 코칭 자격 과정과 리코MBA는 무엇이 다른가” 비교 콘텐츠</li>
+          <li>졸업생 진로 사례(사내 코치, 독립 코치, HRD) 인터뷰 연재</li>
+        </ul>
+        <p class="kpi-line"><b>측정</b> 콘텐츠 조회 후 설명회·상담 신청 전환</p>
+      </article>
+      <article class="card">
+        <div class="who">넓히기 · 교차점 3 교수진</div>
+        <h3>교수가 직접 보이는 외부 접점</h3>
+        <ul>
+          <li>코칭·HR 컨퍼런스 발표, 기업 특강에 교수진 참여 확대와 현장 입학 안내</li>
+          <li>온·오프라인 입학설명회 정례화 (재학생이 벤치마크로 꼽은 타 EMBA 사례 참고)</li>
+          <li>교수진 칼럼·짧은 강의 영상을 SNS로 배포</li>
+        </ul>
+        <p class="kpi-line"><b>측정</b> 행사별 문의 수, 지인 외 채널 유입 비중 (현재 52%)</p>
+      </article>
+      <article class="card" style="grid-column:1/-1">
+        <div class="who">보완하기 · 비용</div>
+        <h3>자격 보유자 장학 검토</h3>
+        <ul>
+          <li>KPC 등 코칭 자격 보유자 대상 장학(금액·기간)을 타 대학과 비교해 검토</li>
+          <li>장학 정보를 모집 요강과 홈페이지에 표로 공개</li>
+        </ul>
+        <p class="kpi-line"><b>측정</b> 자격 보유 지원자 수, 상담 중 장학 문의 비중</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="int-h">
+    <div class="sec-head">
+      <h2 id="int-h">해석의 한계와 다음 조사</h2>
+    </div>
+    <div class="limits">
+      <ul>
+        <li>한 기수 25명의 응답입니다. 경향을 보여주지만 통계적으로 일반화하기는 어렵고, 1명뿐인 경로(컨퍼런스, 입학상담 등)는 사례로 읽어야 합니다.</li>
+        <li>입학한 사람만 조사했습니다. 문의했지만 지원하지 않은 사람, 합격했지만 등록하지 않은 사람의 경로를 함께 모아야 채널별 실제 전환율(유효성)을 계산할 수 있습니다.</li>
+        <li>문항이 단일 선택이라 여러 채널과 요인을 함께 고려한 경우가 하나로만 기록되었습니다. 복수 선택과 우선순위, “추천인 기수” 문항을 추가하면 경로를 더 정확히 추적할 수 있습니다.</li>
+        <li>3번 문항은 ‘기타’ 선택자만 답하도록 되어 있어 대부분의 결정 이유를 알 수 없습니다. 모든 응답자에게 이유를 묻도록 바꾸면 결정 요인의 내용을 더 깊이 볼 수 있습니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="raw-h">
+    <div class="sec-head"><h2 id="raw-h">응답별 경로</h2><p class="note">행에 마우스를 올리면 위 지도에서 해당 입학생의 경로가 강조됩니다. 이름은 가렸습니다.</p></div>
+    <div class="tbl-wrap">
+      <table id="raw">
+        <thead><tr><th>#</th><th>정보 획득</th><th>결정적 영향</th><th>제안사항 (요약)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const P = [
+ {id:1, a:"지인", b:"지인 추천", d:"추천·입소문 강화", sug:"추천을 지원할 다양한 소개자료"},
+ {id:2, a:"홈페이지", b:"커리큘럼", d:"응답 없음", sug:""},
+ {id:3, a:"홈페이지", b:"커리큘럼", d:"장학·학비", sug:"타 대학 대비 장학 (KPC 취득자 금액·기간)"},
+ {id:4, a:"지인", b:"지인 추천", d:"응답 없음", sug:""},
+ {id:5, a:"지인", b:"지인 추천", d:"응답 없음", sug:""},
+ {id:6, a:"기타", b:"교수진", d:"응답 없음", sug:""},
+ {id:7, a:"컨퍼런스 등", b:"교수진", d:"추천·입소문 강화", sug:"재학생·졸업생 추천활동이 가장 강력한 홍보"},
+ {id:8, a:"홈페이지", b:"지인 추천", d:"진로·차별화 콘텐츠", sug:"외부 기관 자격증과 리코MBA의 차이를 알리는 콘텐츠"},
+ {id:9, a:"홈페이지", b:"인지도", d:"외부 홍보·설명회", sug:"온·오프라인 입학설명회 등 행사"},
+ {id:10,a:"지인", b:"커리큘럼", d:"추천·입소문 강화", sug:"입소문이 최고"},
+ {id:11,a:"홈페이지", b:"교수진", d:"진로·차별화 콘텐츠", sug:"과정의 실용성과 코치 진로 전망 안내"},
+ {id:12,a:"홈페이지", b:"기타(수업방식·자격증)", d:"응답 없음", sug:"", note:"기타 이유: 토요일 전일제 수업"},
+ {id:13,a:"지인", b:"지인 추천", d:"응답 없음", sug:""},
+ {id:14,a:"지인", b:"지인 추천", d:"외부 홍보·설명회", sug:"외부 SNS 홍보, 리더십 프로그램 다양화"},
+ {id:15,a:"입학상담", b:"동문 네트워크", d:"진로·차별화 콘텐츠", sug:"입학–졸업–졸업 후 로드맵 제시"},
+ {id:16,a:"지인", b:"인지도", d:"응답 없음", sug:""},
+ {id:17,a:"기타", b:"커리큘럼", d:"응답 없음", sug:""},
+ {id:18,a:"홈페이지", b:"커리큘럼", d:"응답 없음", sug:""},
+ {id:19,a:"지인", b:"인지도", d:"응답 없음", sug:""},
+ {id:20,a:"지인", b:"지인 추천", d:"응답 없음", sug:""},
+ {id:21,a:"홈페이지", b:"동문 네트워크", d:"응답 없음", sug:""},
+ {id:22,a:"지인", b:"지인 추천", d:"응답 없음", sug:""},
+ {id:23,a:"지인", b:"지인 추천", d:"응답 없음", sug:""},
+ {id:24,a:"지인", b:"인지도", d:"응답 없음", sug:""},
+ {id:25,a:"홈페이지", b:"기타(수업방식·자격증)", d:"응답 없음", sug:"", note:"기타 이유: 코칭심리 대학원 탐색 중 발견, 동문 네트워크·자격증 취득이 인상적, 문의 메일 후 결정"},
+];
+const COLS = [
+ {key:"a", head:"① 정보 획득 경로", q:"Q1. 입학 정보를 주로 어디서?", order:["지인","홈페이지","기타","컨퍼런스 등","입학상담"]},
+ {key:"b", head:"② 결정에 가장 큰 영향", q:"Q2. (기타는 Q3 이유로 보완)", order:["지인 추천","인지도","커리큘럼","기타(수업방식·자격증)","교수진","동문 네트워크"]},
+ {key:"d", head:"③ 제안사항", q:"Q4. 제안 (유형화)", order:["응답 없음","추천·입소문 강화","외부 홍보·설명회","진로·차별화 콘텐츠","장학·학비"]},
+];
+const LABEL={"홈페이지":"대학원 홈페이지","기타(수업방식·자격증)":"기타 (수업방식·자격증)"};
+const ORIGIN={"지인":"var(--s1)","홈페이지":"var(--s2)","컨퍼런스 등":"var(--s3)","입학상담":"var(--s4)","기타":"var(--s5)"};
+const CROSS=[[0,"홈페이지"],[1,"커리큘럼"],[1,"교수진"]];
+const TOP=64, U=16, GAP=14, NW=190, N=P.length;
+const xs=[0, 465, 930];
+const NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("sankey");
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e};
+const pct=n=>Math.round(n/N*100);
+
+const nodes=COLS.map((c,ci)=>{
+  let y=TOP; const arr=[];
+  c.order.forEach(name=>{
+    const ppl=P.filter(p=>p[c.key]===name);
+    if(!ppl.length)return;
+    arr.push({name,ci,x:xs[ci],y,h:ppl.length*U,ppl,outOff:0,inOff:0});
+    y+=ppl.length*U+GAP;
+  });
+  return arr;
+});
+const idx=(ci,name)=>nodes[ci].findIndex(n=>n.name===name);
+const bandsLayer=el("g",{}), arrowsLayer=el("g",{});
+const allBands=[];
+for(let ci=0;ci<COLS.length-1;ci++){
+  const k1=COLS[ci].key,k2=COLS[ci+1].key, groups={};
+  P.forEach(p=>{const g=p[k1]+"|"+p[k2];(groups[g]=groups[g]||[]).push(p)});
+  const links=Object.values(groups).map(ppl=>({s:nodes[ci][idx(ci,ppl[0][k1])],t:nodes[ci+1][idx(ci+1,ppl[0][k2])],ppl}));
+  links.forEach(l=>l.ppl.sort((a,b)=>COLS[0].order.indexOf(a.a)-COLS[0].order.indexOf(b.a)||a.id-b.id));
+  nodes[ci].forEach(n=>{links.filter(l=>l.s===n).sort((a,b)=>a.t.y-b.t.y).forEach(l=>{l.sy=n.y+n.outOff;n.outOff+=l.ppl.length*U})});
+  nodes[ci+1].forEach(n=>{links.filter(l=>l.t===n).sort((a,b)=>a.s.y-b.s.y).forEach(l=>{l.ty=n.y+n.inOff;n.inOff+=l.ppl.length*U})});
+  links.forEach(l=>{
+    const x0=l.s.x+NW, x1=l.t.x-2, h=l.ppl.length*U;
+    const ah=Math.min(22, 8+h*0.08), xe=x1-ah, mx=(x0+xe)/2;
+    l.ppl.forEach((p,k)=>{
+      const a=l.sy+k*U, b=l.ty+k*U;
+      const path=el("path",{d:`M${x0},${a} C${mx},${a} ${mx},${b} ${xe},${b} L${xe},${b+U} C${mx},${b+U} ${mx},${a+U} ${x0},${a+U} Z`,fill:ORIGIN[p.a],"fill-opacity":.55,class:"band",stroke:"var(--surface)","stroke-width":1},bandsLayer);
+      path.dataset.pid=p.id; allBands.push(path);
+    });
+    const ids=l.ppl.map(p=>p.id);
+    const tri=el("path",{d:`M${xe},${l.ty-2} L${x1},${l.ty+h/2} L${xe},${l.ty+h+2} Z`,fill:"var(--ink-2)",class:"band"},arrowsLayer);
+    tri.dataset.pids=ids.join(","); allBands.push(tri);
+    const hit=el("path",{d:`M${x0},${l.sy} C${mx},${l.sy} ${mx},${l.ty} ${xe},${l.ty} L${x1},${l.ty+h/2} L${xe},${l.ty+h} C${mx},${l.ty+h} ${mx},${l.sy+h} ${x0},${l.sy+h} Z`,fill:"transparent",style:"cursor:pointer"},arrowsLayer);
+    const sn=LABEL[l.s.name]||l.s.name, tn=LABEL[l.t.name]||l.t.name;
+    hit.addEventListener("mousemove",e=>showTip(e,`<b>${sn} → ${tn}</b><br>${ids.length}명 (${pct(ids.length)}%)`));
+    hit.addEventListener("mouseenter",()=>highlight(ids,`‘${sn}’ → ‘${tn}’: ${ids.length}명의 전체 여정`));
+    hit.addEventListener("mouseleave",()=>{hideTip();applyFilter(current)});
+    if(ids.length>=2){const t=el("text",{x:mx,y:(l.sy+l.ty)/2+h/2+4,"text-anchor":"middle",class:"num","font-size":"13","font-weight":"600",fill:"var(--ink)"},arrowsLayer);t.textContent=ids.length+"명";t.style.pointerEvents="none"}
+  });
+}
+COLS.forEach((c,ci)=>{
+  el("text",{x:xs[ci],y:22,class:"col-head"}).textContent=c.head;
+  el("text",{x:xs[ci],y:40,class:"col-q"}).textContent=c.q;
+});
+nodes.flat().forEach(n=>{
+  const g=el("g",{style:"cursor:pointer"});
+  el("rect",{x:n.x,y:n.y,width:NW,height:n.h,rx:5,fill:"var(--node)"},g);
+  const cy=n.y+n.h/2;
+  const name=LABEL[n.name]||n.name;
+  const t=el("text",{x:n.x+10,y:cy+4.5,class:"node-label","font-size":"12"},g);t.textContent=name;t.style.fontSize="12.5px";
+  const c=el("text",{x:n.x+NW-10,y:cy+4.5,class:"node-count","text-anchor":"end"},g);c.textContent=n.ppl.length;
+  const ids=n.ppl.map(p=>p.id);
+  g.addEventListener("mousemove",e=>showTip(e,`<b>${name}</b><br>${ids.length}명 (${pct(ids.length)}%)`));
+  g.addEventListener("mouseenter",()=>highlight(ids,`‘${name}’을 지난 ${ids.length}명의 전체 여정`));
+  g.addEventListener("mouseleave",()=>{hideTip();applyFilter(current)});
+});
+CROSS.forEach(([ci,name])=>{
+  const n=nodes[ci][idx(ci,name)];
+  el("rect",{x:n.x-4,y:n.y-4,width:NW+8,height:n.h+8,rx:8,fill:"none",stroke:"var(--hl-ink)","stroke-width":2,"stroke-dasharray":"5 4"});
+});
+
+function highlight(ids,caption){
+  const set=new Set(ids.map(String));
+  svg.classList.add("dim");
+  allBands.forEach(b=>{const own=b.dataset.pid?[b.dataset.pid]:b.dataset.pids.split(",");b.classList.toggle("off",!own.some(i=>set.has(i)))});
+  document.getElementById("cap").textContent=caption;
+}
+function clearHL(){svg.classList.remove("dim");allBands.forEach(b=>b.classList.remove("off"));document.getElementById("cap").textContent="전체 25명의 경로입니다."}
+const PROG=["커리큘럼","교수진"];
+const FILTERS={
+  all:null,
+  core:{ids:P.filter(p=>p.a==="지인"&&p.b==="지인 추천").map(p=>p.id),cap:"핵심 경로 지인 → 지인 추천: 8명(32%). 이 중 6명은 제안사항을 남기지 않았습니다."},
+  hub:{ids:P.filter(p=>p.a==="홈페이지").map(p=>p.id),cap:"홈페이지로 들어온 9명: 결정 요인이 여섯 유형 모두로 흩어지고, 4명이 제안을 남겼습니다."},
+  prog:{ids:P.filter(p=>PROG.includes(p.b)).map(p=>p.id),cap:"커리큘럼·교수진으로 결정한 8명: 지인으로 들어온 사람은 1명뿐입니다."},
+  ext:{ids:P.filter(p=>p.a!=="지인").map(p=>p.id),cap:"지인 외 채널로 들어온 13명: 8명이 프로그램 요인으로 결정했고, 6명이 제안을 남겼습니다."},
+};
+let current="all";
+function applyFilter(f){const F=FILTERS[f];F?highlight(F.ids,F.cap):clearHL()}
+document.querySelectorAll(".toolbar button").forEach(b=>b.addEventListener("click",()=>{
+  current=b.dataset.f;
+  document.querySelectorAll(".toolbar button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  applyFilter(current);
+}));
+const tip=document.getElementById("tip");
+function showTip(e,html){tip.innerHTML=html;tip.hidden=false;tip.style.left=Math.min(e.clientX+14,innerWidth-300)+"px";tip.style.top=(e.clientY+14)+"px"}
+function hideTip(){tip.hidden=true}
+
+const tb=document.querySelector("#raw tbody");
+P.forEach(p=>{
+  const tr=document.createElement("tr");
+  const bb=(LABEL[p.b]||p.b)+(p.note?`<br><span class="note">${p.note}</span>`:"");
+  tr.innerHTML=`<td class="num">${p.id}</td><td><span class="sw" style="background:${ORIGIN[p.a]}"></span>${LABEL[p.a]||p.a}</td><td>${bb}</td><td>${p.sug||"—"}</td>`;
+  tr.addEventListener("mouseenter",()=>highlight([p.id],`응답자 ${p.id}: ${LABEL[p.a]||p.a} → ${LABEL[p.b]||p.b} → ${p.d}`));
+  tr.addEventListener("mouseleave",()=>applyFilter(current));
+  tb.appendChild(tr);
+});
+</script>
+</body>
+</html>
